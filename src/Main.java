@@ -2,9 +2,22 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
 
+
+//lsof -i :PORT
+
 public class Main {
+
+    public void SendMessage(String ipClient){
+
+    }
+
     public Process serverProcess;
+    private BufferedWriter serverWriter;
+
     public Process clientProcess;
+
+    JTextArea log = new JTextArea();
+
     public void main(String[] args) {
 
         JFrame frame = new JFrame("Network Control");
@@ -15,40 +28,54 @@ public class Main {
 
         JButton serverBtn = new JButton("Start Server");
         JButton clientBtn = new JButton("Start Client");
-        JButton stopBtn = new JButton("Stop Server/Client");
+       // JButton stopBtn = new JButton("Stop Server/Client");
         JTextField ipField = new JTextField(15);
 
-        JTextArea log = new JTextArea();
+
         JScrollPane scroll = new JScrollPane(log);
 
         serverBtn.addActionListener(e -> {
             try {
                 ProcessBuilder pb = new ProcessBuilder("./native/server");
-
-                serverProcess = pb.start();
                 log.append("Server started\n");
+                serverProcess = pb.start();
 
                 BufferedReader reader =
                         new BufferedReader(new InputStreamReader(serverProcess.getInputStream()));
+                serverWriter = new BufferedWriter(
+                        new OutputStreamWriter(serverProcess.getOutputStream())
+                );
 
                 new Thread(() -> {
                     try {
                         String line;
-                        while((line = reader.readLine()) != null) {
-                            String finalLine = line;
+                        while ((line = reader.readLine()) != null) {
+                            String currentLine = line;
+
 
                             SwingUtilities.invokeLater(() -> {
-                                log.append(finalLine + "\n");
+                                log.append(currentLine + "\n");
                             });
+
+                            if (currentLine.contains("Chose a message to send:")) {
+                                String message = JOptionPane.showInputDialog("Enter message to send:");
+                                if (message != null) {
+                                    serverWriter.write(message);
+                                    serverWriter.newLine();
+                                    serverWriter.flush();
+                                }
+                            }
                         }
-                    } catch(Exception ex){
+                    } catch (IOException ex) {
                         ex.printStackTrace();
+                        SwingUtilities.invokeLater(() -> log.append("Connection lost: " + ex.getMessage() + "\n"));
                     }
                 }).start();
+
             } catch(Exception ex){
                 ex.printStackTrace();
                 log.append(ex.getMessage() + "\n");
-            }
+            };
         });
 
         clientBtn.addActionListener(e -> {
@@ -64,6 +91,7 @@ public class Main {
 
                 new Thread(() -> {
                     try {
+
                         String line;
                         while((line = reader.readLine()) != null) {
                             String finalLine = line;
