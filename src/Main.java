@@ -36,7 +36,7 @@ public class Main {
 
         serverBtn.addActionListener(e -> {
             try {
-                ProcessBuilder pb = new ProcessBuilder("./native/server");
+                ProcessBuilder pb = new ProcessBuilder("./Native/server");
                 log.append("Server started\n");
                 serverProcess = pb.start();
 
@@ -82,7 +82,7 @@ public class Main {
             try {
                 if(ipField.getText().equals("")) {log.append("IP is empty\n"); return;}
                 ProcessBuilder pb =
-                        new ProcessBuilder("./native/client",ipField.getText());
+                        new ProcessBuilder("./Native/client",ipField.getText());
                 clientProcess = pb.start();
                 log.append("Client started\n");
 

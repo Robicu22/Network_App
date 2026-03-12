@@ -3,6 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/Network_App_jar</output-path>
     <root id="archive" name="Network_App.jar">
       <element id="module-output" name="Network_App" />
+      <element id="dir-copy" path="$PROJECT_DIR$/Native" />
     </root>
   </artifact>
 </component>
